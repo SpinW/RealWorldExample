@@ -89,16 +89,14 @@ myaddatom3('Mn3-dn', [0.25 0.25 0.1], 'black');
 myaddatom3('Mn3-dn', [0.75 0.25 0.1], 'black');
 plot(pcsmo, 'range', [1 1 1])
 
-% Get the list of indices of which are spin up and which are down atoms:
-spin_up = cellfun(@isempty, strfind(pcsmo.table('matom').matom, 'up'))
-spin_dn = cellfun(@isempty, strfind(pcsmo.table('matom').matom, 'dn'))
-
 %%
 % Generate the magnetic structure
 S0 = [0; 1; 0];
 
+% Get the list of indices of which are spin up and which are down atoms:
 spin_up = find(~cellfun(@isempty, strfind(pcsmo.table('matom').matom, 'up')));
 spin_dn = find(~cellfun(@isempty, strfind(pcsmo.table('matom').matom, 'dn')));
+
 SS = zeros(3, 16);
 SS(:, spin_up) = repmat(S0, 1, numel(spin_up));
 SS(:, spin_dn) = repmat(-S0, 1, numel(spin_dn));
@@ -110,9 +108,8 @@ plot(pcsmo, 'range', [0 1; 0 1; 0 0.2])
 %%
 % Now define the exchange interactions for the Goodenough model.
 % We have to force P1 symmetry because the nearest neighbour bonds (intra-
-% and inter-chain) do not obey any symmetry.
-% (We only used C2/m above to save having to type in all the coordinates
-% individually).
+% and inter-chain) do not obey any translational symmetry of the structural
+% orthorhombic cell.
 pcsmo.gencoupling('forceNoSym', true)
 % Print out table to determine which bond is which
 pcsmo.table('bond', 1)
@@ -131,14 +128,14 @@ pcsmo.addmatrix('label', 'JF3', 'value', JF3, 'color', 'red');
 pcsmo.addmatrix('label', 'Jperp', 'value', Jperp, 'color', 'blue');
 pcsmo.addmatrix('label', 'D', 'value', diag([0 0 D]), 'color', 'white');
 
-%%
-pcsmo.gencoupling('forceNoSym', true)
 % The zig-zag chains couple Mn3-Mn4 with same spin.
 pcsmo.addcoupling('mat', 'JF1', 'bond', 1, 'atom', {'Mn3-up', 'Mn4-up'})
 pcsmo.addcoupling('mat', 'JF1', 'bond', 1, 'atom', {'Mn3-dn', 'Mn4-dn'})
+% And vice-versa for the inter-chain interaction
 pcsmo.addcoupling('mat', 'JA', 'bond', 1, 'atom', {'Mn3-up', 'Mn4-dn'})
 pcsmo.addcoupling('mat', 'JA', 'bond', 1, 'atom', {'Mn3-dn', 'Mn4-up'})
 pcsmo.addcoupling('mat', 'Jperp', 'bond', 2)
+% JF3 couples Mn3 within the same zig-zag (same spin)
 pcsmo.addcoupling('mat', 'JF3', 'bond', 3, 'atom', 'Mn3-up')
 pcsmo.addcoupling('mat', 'JF3', 'bond', 3, 'atom', 'Mn3-dn')
 % For the Mn4+ intra-zigzag next nearest neighbour we cannot use just the
@@ -146,8 +143,18 @@ pcsmo.addcoupling('mat', 'JF3', 'bond', 3, 'atom', 'Mn3-dn')
 % pcsmo.gencoupling('forceNoSym', true)
 % pcsmo.addcoupling('mat', 'JF2', 'bond', 8, 'atom', 'Mn4-up')
 % plot(pcsmo, 'range', [0 2; 0 2; 0 0.2])
-% And see what it produces. So we have to use subIdx
-pcsmo.addcoupling('mat', 'JF2', 'bond', 8, 'subIdx', [2 3 10 14  5 7 12 13])
+% And see what it produces).
+% We actually only want interactions going in the +b direction which
+% originates from the Mn4+ atom which have a=0.5.
+% Find indexes of the Mn4+ atoms which have a=0.5:
+idmid = find((~cellfun(@isempty, strfind(pcsmo.table('matom').matom, 'Mn4'))) ...
+    .* (pcsmo.table('matom').pos(:,1)==0.5));
+bond8 = pcsmo.table('bond', 8);
+% Finds the bonds which start on one of these atoms and goes along +b
+idstart = find(ismember(bond8.idx1, idmid) .* (bond8.dr(:,2)>0));
+% Finds the bonds which ends on one of these atoms and goes along -b
+idend = find(ismember(bond8.idx2, idmid) .* (bond8.dr(:,2)<0));
+pcsmo.addcoupling('mat', 'JF2', 'bond', 8, 'subIdx', [idstart; idend]')
 
 pcsmo.addaniso('D')
 plot(pcsmo, 'range', [0 1; 0 1; 0 0.2])
