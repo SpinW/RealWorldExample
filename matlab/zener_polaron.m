@@ -9,8 +9,9 @@
 % S=7/2 spin, and will be modelled in SpinW as such with the position of
 % the Mn_2^7+ polaron being the center of the pair of Mn-Mn atoms.
 
-% Lattice parameters for Pr(Ca0.1Sr0.9)2Mn2O7
-lat = [5.408 5.4599 19.266];
+% Lattice parameters - we simplify to make it tetragonal to decrease the
+% number of exchange bonds to be defined later.
+lat = [5.5 5.5 20];
 alf = [90 90 90];
 
 % Like for the CE model in prcasrmn2o7.m we are forced to use a doubled
@@ -22,20 +23,23 @@ zp.genlattice('lat_const', lat.*[2 2 1], 'angled', alf, 'spgr', 'x,y,-z');
 % what a Zener Polaron is and cannot assign it a form factor or scattering
 % length - you can ignore this as we will just calculate the dispersion
 % with this model.
-zp.addatom('label', 'ZP-up', 'r', [0.375 0.375 0.1], 'S', 7/2, 'color', 'gold');
-zp.addatom('label', 'ZP-up', 'r', [0.875 0.625 0.1], 'S', 7/2, 'color', 'gold');
-zp.addatom('label', 'ZP-dn', 'r', [0.375 0.875 0.1], 'S', 7/2, 'color', 'gold');
-zp.addatom('label', 'ZP-dn', 'r', [0.875 0.175 0.1], 'S', 7/2, 'color', 'gold');
+zp.addatom('label', 'ZP-up', 'r', [0.125 0.875 0.1], 'S', 7/2, 'color', 'gold');
+zp.addatom('label', 'ZP-lf', 'r', [0.625 0.625 0.1], 'S', 7/2, 'color', 'gold');
+zp.addatom('label', 'ZP-dn', 'r', [0.125 0.375 0.1], 'S', 7/2, 'color', 'gold');
+zp.addatom('label', 'ZP-rg', 'r', [0.625 0.125 0.1], 'S', 7/2, 'color', 'gold');
 
 % Set the magnetic structure
-spin_up = cellfun(@isempty, strfind(zp.table('matom').matom, 'up'));
-spin_dn = cellfun(@isempty, strfind(zp.table('matom').matom, 'dn'));
-S0 = [1; 0; 0];
+S0 = [0; 1; 0];
+S1 = [1; 0; 0];
 spin_up = find(~cellfun(@isempty, strfind(zp.table('matom').matom, 'up')));
 spin_dn = find(~cellfun(@isempty, strfind(zp.table('matom').matom, 'dn')));
+spin_lf = find(~cellfun(@isempty, strfind(zp.table('matom').matom, 'lf')));
+spin_rg = find(~cellfun(@isempty, strfind(zp.table('matom').matom, 'rg')));
 SS = zeros(3, numel(spin_up)+numel(spin_dn));
 SS(:, spin_up) = repmat(S0, 1, numel(spin_up));
 SS(:, spin_dn) = repmat(-S0, 1, numel(spin_dn));
+SS(:, spin_rg) = repmat(S1, 1, numel(spin_up));
+SS(:, spin_lf) = repmat(-S1, 1, numel(spin_dn));
 zp.genmagstr('mode', 'direct', 'S', SS)
 
 % Now assign the exchange interactions
@@ -49,18 +53,23 @@ Jperp = 1.05;
 zp.gencoupling('forceNoSym', true)
 zp.addmatrix('label', 'JFU', 'value', JFU, 'color', 'green') % FM between non parallel polarons in +b
 zp.addmatrix('label', 'JFD', 'value', JFD, 'color', 'white') % FM between non parallel polarons in -b
-zp.addmatrix('label', 'JA', 'value', JA, 'color', 'yellow') % AFM between parallel polarons
+zp.addmatrix('label', 'JA', 'value', JA, 'color', 'yellow')  % AFM between parallel polarons
 zp.addmatrix('label', 'Jperp', 'value', Jperp, 'color', 'blue')
-zp.addcoupling('mat', 'Jperp', 'bond', 1)
-zp.addcoupling('mat', 'JA', 'bond', 2)
-zp.addcoupling('mat', 'JA', 'bond', 3)
-zp.addcoupling('mat', 'JFD', 'bond', 4)
-zp.addcoupling('mat', 'JA', 'bond', 5)
-zp.addcoupling('mat', 'JFU', 'bond', 6, 'atom', 'ZP-up')
-zp.addcoupling('mat', 'JFD', 'bond', 6, 'atom', {'ZP-up', 'ZP-dn'})
-zp.addcoupling('mat', 'JFU', 'bond', 8)
 
+plot(zp, 'range', [0 2; 0 2; -0.2 0.2]);
+
+% Print the bond table - look at which bond index corresponds to which J
 zp.table('bond', 1:10)
+
+% Assign the J's to the bonds.
+zp.gencoupling('forceNoSym', true)
+zp.addcoupling('mat', 'Jperp', 'bond', 1)  % dr=[0 0 0.2]
+zp.addcoupling('mat', 'JA', 'bond', 2)     % dr=[0 +/-0.5 0]
+zp.addcoupling('mat', 'JFU', 'bond', 3, 'atom', {'ZP-up', 'ZP-lf'}) % Within chains
+zp.addcoupling('mat', 'JFU', 'bond', 3, 'atom', {'ZP-dn', 'ZP-rg'}) % Within chains
+zp.addcoupling('mat', 'JFD', 'bond', 3, 'atom', {'ZP-up', 'ZP-rg'}) % Between chains
+zp.addcoupling('mat', 'JFD', 'bond', 3, 'atom', {'ZP-dn', 'ZP-lf'}) % Between chains
+
 plot(zp, 'range', [0 2; 0 2; -0.2 0.2]);
 
 %%
