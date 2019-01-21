@@ -30,6 +30,7 @@
 	<div class="slides">
 		<!--<section data-external="parts/intro.html"> </section>-->
         <section data-external-replace="real_world.html"> </section>
+		<section data-external-replace="end.html"> </section>
 	</div>
 </div>
 
@@ -78,29 +79,33 @@
 				}
 			},
 			{ src: 'presentation_base/plugin/notes/notes.js', async: true },
-			// { src: 'presentation_base/plugin/highlight/highlight.js',
-			// 	async: true,
-			// 	condition: function () {
-			// 		// Trim whitespace from code blocks, and prevent HTML escaping by default.
-			// 		// This must be done before the plugin is loaded.
-			// 		Array.prototype.forEach.call(
-			// 				document.querySelectorAll('pre code'),
-			// 				function (element) {
-			// 					if (!element.hasAttribute('data-notrim')) {
-			// 						element.setAttribute('data-trim', '');
-			// 					}
-			// 					if (!element.hasAttribute('data-escape')) {
-			// 						element.setAttribute('data-noescape', '');
-			// 					}
-			// 				}
-			// 		);
-			// 		return true;
-			// 	},
-			// 	callback: function () {
-			// 		hljs.initHighlightingOnLoad();
-			// 	}
-			// },
-			{ src: 'presentation_base/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+			{
+				src: 'presentation_base/plugin/highlight/highlight.js',
+				async: true,
+				condition: function () {
+					// Trim whitespace from code blocks, and prevent HTML escaping by default.
+					// This must be done before the plugin is loaded.
+					Array.prototype.forEach.call(
+							document.querySelectorAll('pre code'),
+							function (element) {
+								if (!element.hasAttribute('data-notrim')) {
+									element.setAttribute('data-trim', '');
+								}
+								if (!element.hasAttribute('data-escape')) {
+									element.setAttribute('data-noescape', '');
+								}
+							}
+					);
+					return true;
+				},
+				callback: function () {
+					hljs.initHighlightingOnLoad();
+					var content_div = document.getElementById("edit");
+					content_div.addEventListener("blur", function() {
+						hljs.highlightBlock(document.getElementById("codeblock"));
+					})
+				}
+			},
 			{ src: 'presentation_base/js/jquery-3.3.1.min.js' },
 			{ src: 'presentation_base/plugin/function-plot/site/js/vendor/d3.js' },
 			{ src: 'presentation_base/plugin/markdown/marked.js' },
