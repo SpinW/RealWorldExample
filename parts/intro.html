@@ -1,0 +1,246 @@
+<section>
+    <style>
+        .tab {
+            text-indent: 40px;
+        }
+
+        .center {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        .column {
+            float: left;
+            width: 50%;
+        }
+
+        /* Clear floats after the columns */
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .defaulttable {
+            display: table;
+        }
+        .defaulttable thead {
+            display: table-header-group;
+        }
+        .defaulttable tbody {
+            display: table-row-group;
+        }
+        .defaulttable tfoot {
+            display: table-footer-group;
+        }
+        .defaulttable tbody>tr:hover,
+        .defaulttable tbody>tr {
+            display: table-row;
+        }
+        .defaulttable tbody>tr:hover>td,
+        .defaulttable tbody>tr>td {
+            display: table-cell;
+        }
+        .defaulttable,
+        .defaulttable tbody,
+        .defaulttable tbody>tr:hover,
+        .defaulttable tbody>tr,
+        .defaulttable tbody>tr:hover>td,
+        .defaulttable tbody>tr>td,
+        .defaulttable tbody>tr:hover>th,
+        .defaulttable tbody>tr>th,
+        .defaulttable thead>tr:hover>td,
+        .defaulttable thead>tr>td,
+        .defaulttable thead>tr:hover>th,
+        .defaulttable thead>tr>th,
+        .defaulttable tfoot>tr:hover>td,
+        .defaulttable tfoot>tr>td,
+        .defaulttable tfoot>tr:hover>th,
+        .defaulttable tfoot>tr>th {
+            background: transparent;
+            background-color: #FFF;
+            border: 0px solid #000;
+            border-spacing: 0px;
+            border-collapse: separate;
+            empty-cells: show;
+            padding: 0px;
+            margin: 0px;
+            outline: 0px;
+            font-size: 100%;
+            color: #000;
+            vertical-align: top;
+            text-align: left;
+            font-family: sans-serif;
+            table-layout: auto;
+            caption-side: top;
+            -webkit-border-radius: 0px;
+            -moz-border-radius: 0px;
+            border-radius: 0px;
+            -webkit-background-clip: padding-box;
+            -moz-background-clip: padding;
+            background-clip: padding-box;
+        }
+
+        .limiter {
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .wrap-table100 {
+            width: 100%;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: -moz-box;
+            display: -ms-flexbox;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        table {
+            border-spacing: 1;
+            border-collapse: collapse;
+            background: #F8F8F8;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+        table * {
+            position: relative;
+        }
+        table td, table th {
+            padding-left: 8px;
+        }
+        table thead tr {
+            height: 60px;
+            background: #36304a;
+        }
+        table tbody tr {
+            height: 50px;
+        }
+        table tbody tr:last-child {
+            border: 0;
+            border-right: none;
+        }
+        table tbody td:last-child {
+            border-right: none;
+        }
+        table td, table th {
+            text-align: left;
+        }
+        table td.l, table th.l {
+            text-align: right;
+        }
+        table td.c, table th.c {
+            text-align: center;
+        }
+        table td.r, table th.r {
+            text-align: center;
+        }
+
+
+        .table100-head th{
+            color: #fff;
+            line-height: 1.2;
+            font-weight: unset;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #E8E8E8;
+        }
+
+        tbody tr {
+            color: #606060;
+            line-height: 1.2;
+            font-weight: unset;
+        }
+
+        tbody tr:hover {
+            color: #555555;
+            background-color: #f5f5f5;
+            cursor: pointer;
+
+        }
+
+        .lastcolumn {
+            text-align: right;
+        }
+        @media screen and (max-width: 640px) {
+            table {
+                overflow-x: auto;
+                display: block;
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            table {
+                display: block;
+            }
+            table > *, table tr, table td, table th {
+                display: block;
+            }
+            table thead {
+                display: none;
+            }
+            table tbody tr {
+                height: auto;
+                padding: 37px 0;
+            }
+            table tbody tr td {
+                padding-left: 40% !important;
+                margin-bottom: 24px;
+            }
+            table tbody tr td:last-child {
+                margin-bottom: 0;
+            }
+            table tbody tr td:before {
+                font-family: OpenSans-Regular;
+                font-size: 14px;
+                color: #999999;
+                line-height: 1.2;
+                font-weight: unset;
+                position: absolute;
+                width: 40%;
+                left: 30px;
+                top: 0;
+            }
+
+            tbody tr {
+                font-size: 14px;
+            }
+        }
+    </style>
+    <section class="intro" id="SpinW">
+        <div class="logo-wrapper">
+            <div class="logo"><span class="visually-hidden">SpinW</span></div>
+        </div>
+    </section>
+
+    <section class="title" id="title">
+        <div class="grid-wrapper">
+            <div class="header">
+                <!-- Remove logo--full class to only show brand mark -->
+                <div class="logo logo--full"><span class="visually-hidden">SpinW</span></div>
+            </div>
+            <div class="content">
+                <h1>Advanced features and real world systems</h1>
+                <div class="description">
+                    Tutorials on dealing with complex real world systems ans publication quality graphics.
+                </div>
+            </div>
+            <div class="credit">
+                <hr/>
+                <div class="label">Presented By</div>
+                <div class="name">Simon Ward</div>
+                <div class="role">Scientific Software Developer - ESS</div>
+                <div class="name">Duc Le</div>
+                <div class="role">Instrument Scientist - ISIS Facility</div>
+            </div>
+        </div>
+    </section>
+</section>

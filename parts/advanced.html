@@ -1,0 +1,285 @@
+
+<section>
+    <section class="subsection color--radiant" id="tutorial_head1">
+    <div class="grid-wrapper">
+        <div class="logo"></div>
+        <h1>Yb$_2$Ti$_2$O$_7$ - Excitations in a quantum spin ice</h1>
+        <div class="description">
+            Recreating experimental data in Phys. Rev. X <b>1</b>, 021002<br>
+            Simon Ward - <i>Scientific Software Developer - ESS</i>
+        </div>
+    </div>
+    </section>
+
+    <section class="showit" id="tutorial1">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">Overview</div>
+            </div>
+            <content>
+                <div class="profile">
+                    <div class="basics">
+                        <img src="images/exp.png" alt="paper data of Yb$_2$Ti$_2$O$_7$">
+                        <div class="name"> Published data and simulation of Yb$_2$Ti$_2$O$_7$</div>
+                        <div class="role"> Phys. Rev. X <b>1</b>, 021002</div>
+                    </div>
+                    <div id="details">
+                        <h3> Overview</h3>
+                        <p>We will be trying to recreate <a href="https://journals.aps.org/prx/abstract/10.1103/PhysRevX.1.021002" target="_blank">PhysRevX.1.021002</a></p>
+                        <p>Yb$_2$Ti$_2$O$_7$ is a quantum spin ice with a pyrochlore structure</p>
+                        <p> The Hamiltonian given by:</p><br>
+                        $$
+                            \mathcal{H} = \frac{1}{2} \sum_{i, j} J_{i, j}^{\mu , \nu} S_i^\mu \cdot S_j^\nu - \mu_B H^\mu \sum_i g_i^{\mu, \nu} S_i^\nu
+                        $$
+                    </div>
+                </div>
+            </content>
+        </div>
+    </section>
+
+    <section class="subsection color--radiant" id="Tutorials">
+        <div class="grid-wrapper">
+            <div class="logo"></div>
+            <h1>The Yb$_2$Ti$_2$O$_7$ model</h1>
+            <div class="description">
+                Download the script here: <a href="matlab/sw_tutorial_05.m" style="color: white"><code>sw_tutorial_05.m</code></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="blank  color--dark" id="tut1">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">Creating the lattice</div>
+            </div>
+            <content>
+                <h3>The Yb$_2$Ti$_2$O$_7$ lattice</h3>
+                <p>Download the paper from <a href="https://journals.aps.org/prx/abstract/10.1103/PhysRevX.1.021002" target="_blank">here</a> we will be referencing it quite a bit.</p>
+                <p>SpinW does not contain the space group we need, so we have to manually enter it.</p>
+                <figure class="code">
+                    <pre><code class="matlab">symStr = '-z, y+3/4, x+3/4; z+3/4, -y, x+3/4; ';
+symStr = strcat(symStr, 'z+3/4, y+3/4, -x; y+3/4, x+3/4, -z; ');
+symStr = strcat(symStr, 'x+3/4, -z, y+3/4; -z, x+3/4, y+3/4');
+
+ybti = spinw;
+a = 10.0307;
+ybti.genlattice('lat_const', [a a a], 'angled', [90 90 90], 'spgr', symStr, 'label', 'F d -3 m Z');
+ybti.addatom('label', 'Yb3+', 'r', [1/2 1/2 1/2], 'S', 1/2)
+ybti.addatom('label', 'Ti4+', 'r', [0 0 0])
+ybti.addatom('label', 'O2-', 'r', [0.3318 1/8 1/8])
+ybti.addatom('label', 'O2-', 'r', [3/8 3/8 3/8])
+plot(ybti, 'nMesh', 3)
+swplot.legend('none')</code></pre>
+                </figure>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_1">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">A diversion into plotting options....</div>
+            </div>
+            <content>
+                <h2>Making plots look better</h2>
+                <p>We setup the number of triangular faces to be produced by the plot command using <code>swpref</code>. Each atom is
+                    an icosahedron, where each face is subdivided into triangles nmesh-times (see
+                    <code>swplot.icomesh</code> function).
+                    Thus <code>nmnesh=3</code> will make all sphere to have 1280 faces. <code>npatch</code> determines the number of
+                    subdivision of the circle that is used to generate cylinders an arrows (<code>swplot.arrow</code> and
+                    <code>swplot.cylinder</code>).
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">pref = swpref;
+pref.set({'nmesh', 'npatch'}, {3, 50})</code></pre>
+                </figure><br>
+                <h3>Questions:</h3>
+                <p><i>Take a note of the options in <code>swpref</code>. We will be using it later</i></p>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_2">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">A diversion into plotting options....</div>
+            </div>
+            <content>
+                <h2>Drawing polyhedra</h2>
+                <p>To the draw oxygen polyhedra around the Yb ions, we use the
+                    <code>swplot.plotchem()</code> function, that can draw polyhedra around arbitrary
+                    atoms on an existing crystal structure plot. Now we use center atom 'Yb'
+                    and polyhedra atoms 'O' for oxygen. Since the oxygen environment of Yb is
+                    octahedron, we set the limits to the 8 closes oxygen atom. The same can
+                    be achieved within the <code class="matlab">spinw.plot()</code> function, adding the options below
+                    plus a string <code class="matlab">'chem'</code>, such as '<code>chemAtom1</code>', '<code>chemAtom2</code>', '<code>chemLimit</code>' and
+                    '<code>chemRange</code>' and setting '<code>chemMode</code>' to '<code>poly</code>'.
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">swplot.plotchem('atom1','Yb','atom2','O','limit',8,'range',[0.1 0.9;0.1 0.9;0.1 0.9]);</code></pre>
+                </figure>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_3">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">Creating the Hamiltonian</div>
+            </div>
+            <content>
+                <h2>Creating the Hamiltonian</h2>
+                <p>We can remove the non-magnetic atoms from the spinw object with a single
+                    command using the <code>unitcell()</code> function (not to mix with the unit_cell
+                    property of the spinw object). The <code>unitcell()</code> function can return selected
+                    atoms from the list of symmetry inequivalent atoms in the unit cell. In
+                    our case the magnetic Yb ions are the first atom.
+
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">ybti.unit_cell = ybti.unitcell(1);
+ybti.gencoupling
+ybti.addmatrix('label','J1','value',1)
+ybti.addmatrix('label','g0','value',1);
+
+ybti.addcoupling('mat','J1','bond',1)
+ybti.addg('g0')</code></pre>
+                </figure>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_4">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">Creating the Hamiltonian</div>
+            </div>
+            <content>
+                <h2>Creating the Hamiltonian - Part 2</h2>
+                <p>In the paper the anisotropic g-tensor is defined in the local coordinate
+                    system of the magnetic ions. Where the g_z component is along
+                    the local <code>[1 1 1]</code> direction, while the two perpendicular components are
+                    $g_xy$. In the lattice corrdinate system the g-tensor has the
+                    matrix form: <code>[A B B;B A B;B B A]</code>. One can check the eigenvalues of this
+                    matrix, that has to match with the published values:
+                    $g_{xy}=4.32$ and $g_z=1.8$. From the eigenvalue
+                    calculation we get: $g_{xy}=A-B$; $g_z = A + 2*B$. We
+                    store the calculated g-tensor in the sw object. When calculating the spin
+                    wave intensities, the code takes care the rotation of the g-tensor
+                    according the symmetry operators for every magnetic ion.
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">ybti.matrix.mat(:,:,2) =  -0.84*ones(3)+4.32*eye(3);
+J1 = -0.09; J2 = -0.22; J3 = -0.29; J4 = 0.01;
+ybti.setmatrix('mat','J1','pref',[J1 J3 J2 -J4]);
+</code></pre>
+                </figure><br>
+                <p>Follow the tutorial to make sure you understand what's going on.</p>
+                <h3>Questions:</h3>
+                <p><i>Check that the correct values have been  entered into the exchange martix</i></p>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_5">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">Plotting the Hamiltonian</div>
+            </div>
+            <content>
+                <h2>Plotting the Hamiltonian</h2>
+                <p>With the <code>plot()</code> command, we can plot the magnetic bonds of
+                    Yb$_2$Ti$_2$O$_7$. The arrow pointing from an atom to another denotes the
+                    direction of the bond, while the thicker  arrow at the middle of the bond
+                    denotes the direction of the  Dzyaloshinskii-Moriya vector. Is is also
+                    possible to visualize the g-tensor by setting the '<code>ionMode</code>' to '<code>g</code>'.
+
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">plot(ybti,'ionMode','g')
+swplot.zoom(1.3)
+swplot.legend('none')
+</code></pre>
+                </figure>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_6">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">A diversion into plotting options....</div>
+            </div>
+            <content>
+                <h2>Delving into plotting</h2>
+                <p>The high level <code>spinw.plot</code> command calls lower level commands
+                    (<code>swplot.plotatom, swplot.plotion, swplot.plotbond</code>, etc). For details
+                    check the documentation of spinw.plot or any of the lower level
+                    functions. Any option of the lower level functions can be controlled by
+                    making new options as: lowlevelfunname + lowlevelfunoption, for example
+                    to set the color option of the <code>swplot.plotatom</code> function set '<code>atomColor</code>'
+                    option in the <code>spinw.plot</code> method as in the example below. The low level
+                    functions can be also called separately.
+
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">swplot.plotchem('atom1','Yb','atom2','O','limit',8,'range',[0.1 0.9;0.1 0.9;0.1 0.9]);</code></pre>
+                </figure>
+            </content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_7">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">A diversion into plotting options....</div>
+            </div>
+            <content>
+                <h2>Delving into plotting - Manual polyhedra</h2>
+                <p> To manually plot a polyhedra, you need to supply the vertices which describe the shape. And have them in a shape which MATLAB understands.
+                </p>
+                <figure class="code">
+                    <pre><code class="matlab">swplot.plot('type', 'polyhedron', 'position', permute(R,[2 3 1]));</code></pre>
+                </figure>
+                <br>
+                <h3>Questions</h3>
+                <p><i>Choose 4 atoms and make a tetrahedra or two. Make a note of the atoms x, y, z positions (in fractional lattice co-ordinates) to generate
+                    <code>R</code>. Hint, you might want to turn on the tooltip</i></p>
+                <br>
+                <p>We can also move the atoms by shifting positions by 10 Angstrom to the right.</p>
+                <figure class="code">
+                    <pre><code class="matlab">swplot.plotatom('shift', [10 0 0]', 'mode', 'mag', 'replace', true)</code></pre>
+                </figure></content>
+        </div>
+    </section>
+
+    <section class="blank color--dark" id="tut1_8">
+        <div class="grid-wrapper">
+            <div class="header">
+                <div class="logo"></div>
+                <div class="section">Recreate the papers figure</div>
+            </div>
+            <content>
+                <h2>Recreate the papers figure</h2>
+                <p>Follow and understand what's happening in the script</p>
+                <ul>
+                    <li>Make Q, E slice</li>
+                    <li>Apply a magnetic field and optimise th structure</li>
+                    <li>Apply an instrumental resolution</li>
+                    <li>Create a plot for each applied magnetic field</li>
+                </ul>
+            </content>
+        </div>
+    </section>
+
+</section>
+    
