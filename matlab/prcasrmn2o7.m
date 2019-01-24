@@ -32,6 +32,15 @@ plot(pcsmo, 'range',[2 2 1])
 % You should be able to see that the structure has two bilayers, one
 % with layers at c~0.4 and c~0.6, and one at c~0.1 and c~0.9.
 
+% Note that the "spgr" string can also be a list of the generators
+% rather than just the group name. You can find generators for non-standard
+% settings in the Bilbao Crystallographic Server: 
+% http://www.cryst.ehu.es/cryst/get_gen.html (select generators not general
+% positions). You need the generators in x,y,z form and note that you don't
+% have to include the identity "x,y,z" generator.
+% You could try to look up the generators for Amam (no. 63) and see that it
+% agrees with the coordinate permutations above.
+
 %%
 % Now look at just the middle bilayer
 plot(pcsmo, 'range', [0 2; 0 2; 0.3 0.7])
@@ -60,9 +69,10 @@ plot(pcsmo, 'range', [0 2; 0 2; 0.3 0.7])
 % which is the same size as the magnetic unit cell (since SpinW only allows
 % you to define atoms within the first unit cell, and forces the bonds to 
 % be translationally symmetric in the supercell). This means we have to use
-% lattice parameters in a and b which are twice as large as in the high 
+% lattice parameters a and b which are twice as large as in the high 
 % temperature Amam structure, which means that the hk0 indices outputted 
-% by SpinW should be divided by 2 to get the equivalent positions in the paper.
+% by SpinW should be divided by 2 to get the equivalent positions in the 
+% paper.
 
 SM4 = 7/4;   % Spin length for Mn4+
 SM3 = 7/4;   % Spin length for Mn3+
@@ -87,6 +97,8 @@ myaddatom3('Mn3-up', [0.25 0.75 0.1], 'black');
 myaddatom3('Mn3-up', [0.75 0.75 0.1], 'black');
 myaddatom3('Mn3-dn', [0.25 0.25 0.1], 'black');
 myaddatom3('Mn3-dn', [0.75 0.25 0.1], 'black');
+
+% Plots the atoms
 plot(pcsmo, 'range', [1 1 1])
 
 %%
@@ -104,6 +116,11 @@ pcsmo.genmagstr('mode', 'direct', 'S', SS)
 
 % Plot only a single bilayer
 plot(pcsmo, 'range', [0 1; 0 1; 0 0.2])
+
+% Do you understand the above two sections of code?
+
+% How would you define the atoms and magnetic structure if you didn't label
+% the atoms as "up" or "down" when you define them?
 
 %%
 % Now define the exchange interactions for the Goodenough model.
@@ -131,9 +148,10 @@ pcsmo.addmatrix('label', 'D', 'value', diag([0 0 D]), 'color', 'white');
 % The zig-zag chains couple Mn3-Mn4 with same spin.
 pcsmo.addcoupling('mat', 'JF1', 'bond', 1, 'atom', {'Mn3-up', 'Mn4-up'})
 pcsmo.addcoupling('mat', 'JF1', 'bond', 1, 'atom', {'Mn3-dn', 'Mn4-dn'})
-% And vice-versa for the inter-chain interaction
+% And opposite spins for the inter-chain interaction
 pcsmo.addcoupling('mat', 'JA', 'bond', 1, 'atom', {'Mn3-up', 'Mn4-dn'})
 pcsmo.addcoupling('mat', 'JA', 'bond', 1, 'atom', {'Mn3-dn', 'Mn4-up'})
+% Second neighbour is the inter-layer coupling with our lattice parameters
 pcsmo.addcoupling('mat', 'Jperp', 'bond', 2)
 % JF3 couples Mn3 within the same zig-zag (same spin)
 pcsmo.addcoupling('mat', 'JF3', 'bond', 3, 'atom', 'Mn3-up')
@@ -160,14 +178,22 @@ pcsmo.addaniso('D')
 plot(pcsmo, 'range', [0 1; 0 1; 0 0.2])
 
 %%
+% Check that the structure we defined is optimum for the give exchanges
 res = pcsmo.optmagsteep()
 plot(pcsmo, 'range', [0 1; 0 1; 0 0.2])
 
+% How many iterations did optmagsteep take?
+% What does this mean?
+
 %%
+% Plots the spin wave along some directions
+
 spec = pcsmo.spinwave({[0 0 0] [2 0 0] [2 0 2] [0 0 2] [0 0 0] 500}, 'hermit', false);
 figure; sw_plotspec(spec);
 specg = sw_egrid(spec, 'Evect', linspace(0,100,2000));
-figure; sw_plotspec(specg,'mode','color','dE',0.5);
+figure; sw_plotspec(specg, 'mode', 'color', 'dE',0.5);
+
+% Does the dispersion agree with the paper?
 
 %%
 %{

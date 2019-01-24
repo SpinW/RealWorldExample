@@ -72,10 +72,15 @@ zp.addcoupling('mat', 'JFD', 'bond', 3, 'atom', {'ZP-dn', 'ZP-lf'}) % Between ch
 
 plot(zp, 'range', [0 2; 0 2; -0.2 0.2]);
 
+% Can you see the resemblance between Fig 1c of the Johnstone paper and
+% the magnetic structure which has been defined here?
+
 %%
 % Optimises the structure
 res = zp.optmagsteep()
 plot(zp, 'range', [0 2; 0 2; 0 0.2])
+
+% What's happended here?
 
 %%
 % Calculates the dispersion
@@ -84,3 +89,9 @@ spec = zp.spinwave({[0 0 0] [2 0 0] [2 0 2] [0 0 2] [0 0 0] 500}, 'hermit', fals
 figure; sw_plotspec(spec);
 specg = sw_egrid(spec, 'Evect', linspace(0,100,2000), 'imagChk', false);
 figure; sw_plotspec(specg,'mode','color','dE',0.5);
+
+% How does this compare to the CE model defined in the file prcasrmn2o7.m?
+
+% Why does this happen? (E.g. what is the defining difference between the
+% CE model and the Zener Polaron model as far as the number of spin wave
+% modes is concerned?)
